@@ -9,3 +9,6 @@ license: MIT
 dependencies:
   active_record:
     github: waterlink/active_record.cr
+  pg:
+    github: will/crystal-pg
+    version: 0.4.3
