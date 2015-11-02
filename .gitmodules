@@ -1,0 +1,3 @@
+[submodule "modules/active_record"]
+	path = modules/active_record
+	url = https://github.com/waterlink/active_record.cr

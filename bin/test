@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Run unit tests
+crystal spec
+
+# Compile integration tests that are shipped with
+crystal build integration/integration_spec.cr -o integration/integration_spec -D active_record_adapter
+./integration/integration_spec --fail-fast -v $*

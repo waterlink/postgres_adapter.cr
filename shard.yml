@@ -5,3 +5,7 @@ authors:
   - Oleksii Fedorov <waterlink000@gmail.com>
 
 license: MIT
+
+dependencies:
+  active_record:
+    github: waterlink/active_record.cr
