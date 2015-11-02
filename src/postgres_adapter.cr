@@ -125,6 +125,8 @@ module PostgresAdapter
     end
 
     def delete(id)
+      query = "DELETE FROM #{table_name} WHERE #{primary_field} = $1"
+      connection.exec(query, [id])
     end
 
     def extract_fields(row)
