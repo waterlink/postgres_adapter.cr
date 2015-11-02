@@ -1,1 +1,13 @@
 language: crystal
+
+addons:
+  postgresql: 9.4
+
+services:
+  - postgresql
+
+before_script:
+  - ./script/setup-test-db.sh
+
+script:
+  - ./bin/test
