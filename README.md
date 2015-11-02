@@ -31,7 +31,7 @@ end
 
 Currently it is done through environment variables:
 
-Eithere `PG_URL`:
+Either `PG_URL`:
 
 ```bash
 PG_URL=postgres://<user>:<password>@<host>:<port>/<database>?sslmode=<sslmode>
