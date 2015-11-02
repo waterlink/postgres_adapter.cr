@@ -27,6 +27,26 @@ class User < ActiveRecord::Model
 end
 ```
 
+### Providing postgres connection details
+
+Currently it is done through environment variables:
+
+Eithere `PG_URL`:
+
+```bash
+PG_URL=postgres://<user>:<password>@<host>:<port>/<database>?sslmode=<sslmode>
+```
+
+Or by corresponding components:
+
+```bash
+PG_USER=<user>
+PG_PASS=<password>
+PG_HOST=<host>
+PG_DATABASE=<database>
+PG_SSL_MODE=<sslmode>
+```
+
 ## Development
 
 After cloning run `crystal deps` or `crystal deps update`.
