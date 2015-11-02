@@ -184,4 +184,6 @@ module PostgresAdapter
       ENV["PG_SSL_MODE"]? || "disable"
     end
   end
+
+  ActiveRecord::Registry.register_adapter("postgres", Adapter)
 end
