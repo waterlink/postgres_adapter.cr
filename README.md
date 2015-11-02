@@ -1,4 +1,4 @@
-# postgres_adapter
+# postgres_adapter [![Build Status](https://travis-ci.org/waterlink/postgres_adapter.cr.svg?branch=master)](https://travis-ci.org/waterlink/postgres_adapter.cr)
 
 Postgres adapter for
 [active_record.cr](https://github.com/waterlink/active_record.cr). Uses
