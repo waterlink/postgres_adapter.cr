@@ -60,7 +60,9 @@ module PostgresAdapter
     end
 
     def all
-      [] of Hash(String, ActiveRecord::SupportedType)
+      query = "SELECT #{fields.join(", ")} FROM #{table_name}"
+      result = connection.exec(query)
+      extract_rows(result.rows)
     end
 
     def where(query_hash : Hash)
@@ -90,6 +92,10 @@ module PostgresAdapter
       end
 
       fields
+    end
+
+    def extract_rows(rows)
+      rows.map { |row| extract_fields(row) }
     end
 
     def self._reset_do_this_only_in_specs_78367c96affaacd7
