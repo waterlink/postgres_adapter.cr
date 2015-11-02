@@ -4,9 +4,21 @@ require "pg"
 
 require "active_record"
 require "active_record/adapter"
+require "active_record/sql/query_generator"
 
 module PostgresAdapter
+  class QueryGenerator < ::ActiveRecord::Sql::QueryGenerator
+    def _generate(query : ::ActiveRecord::SupportedType, param_count = 0)
+      param_count += 1
+      ::ActiveRecord::Sql::Query.new("$#{param_count}", { "#{param_count}" => query })
+    end
+  end
+
   class Adapter < ActiveRecord::Adapter
+    include ActiveRecord::CriteriaHelper
+
+    query_generator QueryGenerator.new
+
     def self.build(table_name, primary_field, fields, register = true)
       new(table_name, primary_field, fields, register)
     end
@@ -66,11 +78,40 @@ module PostgresAdapter
     end
 
     def where(query_hash : Hash)
-      all
+      q = nil
+
+      query_hash.each do |key, value|
+        if q
+          q = q.& criteria(key) == value
+        else
+          q = criteria(key) == value
+        end
+      end
+
+      where(q)
+    end
+
+    def where(query : Nil)
+      [] of ActiveRecord::Fields
     end
 
     def where(query : ActiveRecord::Query)
-      all
+      q = self.class.generate_query(query).not_nil!
+      _where(q.query, q.params)
+    end
+
+    def _where(query, params)
+      pg_query = "SELECT #{fields.join(", ")} FROM #{table_name} WHERE #{query}"
+      params = pgify_params(params)
+
+      result = connection.exec(pg_query, params)
+      extract_rows(result.rows)
+    end
+
+    def pgify_params(params)
+      (1..params.size).map do |key|
+        params["#{key}"]
+      end
     end
 
     def update(id, fields)
