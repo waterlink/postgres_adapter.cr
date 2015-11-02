@@ -115,6 +115,13 @@ module PostgresAdapter
     end
 
     def update(id, fields)
+      fields.delete(primary_field)
+
+      expressions = fields.keys.each_with_index(1).to_a.map { |x| "#{x[0]} = $#{x[1]}" }
+      query = "UPDATE #{table_name} SET #{expressions.join(", ")} WHERE #{primary_field} = $#{expressions.size + 1}"
+      params = fields.values + [id]
+
+      connection.exec(query, params)
     end
 
     def delete(id)
