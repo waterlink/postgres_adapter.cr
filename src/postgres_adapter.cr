@@ -47,12 +47,7 @@ module PostgresAdapter
       values = [] of PG::PGValue
       field_names.each do |name|
         if fields.has_key?(name) && !fields[name].null?
-          value = fields[name].not_null!
-          if value.is_a?(Int8) || value.is_a?(Int16)
-            values << value.to_i32
-          else
-            values << value as PG::PGValue
-          end
+          values << pgify_value(fields[name].not_null!)
         else
           values << nil
         end
@@ -60,6 +55,18 @@ module PostgresAdapter
 
       result = connection.exec(query, values)
       result.rows[0][0]
+    end
+
+    private def pgify_value(value)
+      if value.is_a?(Int8)
+        value.to_i32
+      elsif value.is_a?(Int16)
+        value.to_i32
+      elsif value.is_a?(Time)
+        value.to_utc
+      else
+        value
+      end as PG::PGValue
     end
 
     def get(id)
