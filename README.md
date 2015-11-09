@@ -12,7 +12,7 @@ Add this to your application's `shard.yml`:
 dependencies:
   postgres_adapter:
     github: waterlink/postgres_adapter.cr
-    version: 0.2.1
+    version: 0.2.2
 ```
 
 ## Usage
