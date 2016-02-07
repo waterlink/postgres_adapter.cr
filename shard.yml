@@ -1,5 +1,5 @@
 name: postgres_adapter
-version: 0.2.2
+version: 0.3.0
 
 authors:
   - Oleksii Fedorov <waterlink000@gmail.com>
