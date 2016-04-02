@@ -1,5 +1,3 @@
-require "./version"
-
 require "pg"
 
 require "active_record"
