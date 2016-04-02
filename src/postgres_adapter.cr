@@ -12,6 +12,11 @@ module PostgresAdapter
       param_count += 1
       ::ActiveRecord::Sql::Query.new("$#{param_count}", { "#{param_count}" => query })
     end
+
+    def _generate(query : Array(T), param_count = 0)
+      result, param_count = ::ActiveRecord::Sql::ArrayQueryHandler.new { |name| "$#{name}" }.handle(query)
+      result
+    end
   end
 
   class Adapter < ActiveRecord::Adapter
