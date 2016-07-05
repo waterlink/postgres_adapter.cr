@@ -24,7 +24,7 @@ module PostgresAdapter
     @@primary_field : String?
     @@fields : Array(String)?
     @@register : Bool?
-    @@query_generators : Array(QueryGenerator)? #Array(ActiveRecord::QueryGenerator)?
+    @@query_generators : Array(QueryGenerator)?
     @connection : PG::Connection
 
     query_generator QueryGenerator.new
