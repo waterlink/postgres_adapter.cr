@@ -20,6 +20,13 @@ module PostgresAdapter
   class Adapter < ActiveRecord::Adapter
     include ActiveRecord::CriteriaHelper
 
+    @@table_name : String?
+    @@primary_field : String?
+    @@fields : Array(String)?
+    @@register : Bool?
+    @@query_generators : Array(QueryGenerator)? #Array(ActiveRecord::QueryGenerator)?
+    @connection : PG::Connection
+
     query_generator QueryGenerator.new
 
     def self.build(table_name, primary_field, fields, register = true)
@@ -36,9 +43,13 @@ module PostgresAdapter
 
     getter connection, table_name, primary_field, fields
 
-    def initialize(@table_name, @primary_field, @fields, register = true)
+    def initialize(@table_name : String, @primary_field : String, @fields : Array(String), register = true)
       @connection = PG.connect(pg_url)
       self.class.register(self)
+    end
+
+    def self.query_generators
+      (@@query_generators ||= [] of QueryGenerator).not_nil!
     end
 
     def create(fields)
@@ -59,8 +70,7 @@ module PostgresAdapter
       result = connection.exec(query, values)
       result.rows[0][0]
     end
-
-    private def pgify_value(value)
+private def pgify_value(value)
       if value.is_a?(Int8)
         value.to_i32
       elsif value.is_a?(Int16)
