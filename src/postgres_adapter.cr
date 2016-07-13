@@ -36,7 +36,9 @@ module PostgresAdapter
 
     getter connection, table_name, primary_field, fields
 
-    def initialize(@table_name, @primary_field, @fields, register = true)
+    @connection : PG::Connection
+
+    def initialize(@table_name : String, @primary_field : String, @fields : Array(String), register = true)
       @connection = PG.connect(pg_url)
       self.class.register(self)
     end
