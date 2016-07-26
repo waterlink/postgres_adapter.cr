@@ -193,7 +193,7 @@ module PostgresAdapter
     end
 
     def pg_ssl_mode
-      ENV["PG_SSL_MODE"]? || "disable"
+      ENV["PG_SSL_MODE"]? || "prefer"
     end
   end
 
