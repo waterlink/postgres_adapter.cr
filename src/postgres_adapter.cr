@@ -107,7 +107,7 @@ module PostgresAdapter
       [] of ActiveRecord::Fields
     end
 
-    def where(query : ActiveRecord::Query)
+    def where(query : ::Query::Query)
       q = self.class.generate_query(query).not_nil!
       _where(q.query, q.params)
     end
