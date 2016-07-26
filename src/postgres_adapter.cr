@@ -36,7 +36,9 @@ module PostgresAdapter
 
     getter connection, table_name, primary_field, fields
 
-    def initialize(@table_name, @primary_field, @fields, register = true)
+    @connection : PG::Connection
+
+    def initialize(@table_name : String, @primary_field : String, @fields : Array(String), register = true)
       @connection = PG.connect(pg_url)
       self.class.register(self)
     end
@@ -105,7 +107,7 @@ module PostgresAdapter
       [] of ActiveRecord::Fields
     end
 
-    def where(query : ActiveRecord::Query)
+    def where(query : ::Query::Query)
       q = self.class.generate_query(query).not_nil!
       _where(q.query, q.params)
     end
@@ -191,7 +193,7 @@ module PostgresAdapter
     end
 
     def pg_ssl_mode
-      ENV["PG_SSL_MODE"]? || "disable"
+      ENV["PG_SSL_MODE"]? || "prefer"
     end
   end
 
