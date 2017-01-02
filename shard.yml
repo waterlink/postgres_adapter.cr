@@ -1,6 +1,6 @@
 --- 
 name: postgres_adapter
-version: 0.5.0
+version: 0.5.1
 authors: 
   - Oleksii Fedorov <waterlink000@gmail.com>
 license: MIT
