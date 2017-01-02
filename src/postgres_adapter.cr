@@ -11,7 +11,7 @@ module PostgresAdapter
       ::ActiveRecord::Sql::Query.new("$#{param_count}", { "#{param_count}" => query })
     end
 
-    def _generate(query : Array(T), param_count = 0)
+    def _generate(query : Array(T), param_count = 0) forall T
       result, param_count = ::ActiveRecord::Sql::ArrayQueryHandler.new { |name| "$#{name}" }.handle(query)
       result
     end
@@ -36,7 +36,7 @@ module PostgresAdapter
 
     getter connection, table_name, primary_field, fields
 
-    @connection : PG::Connection
+    @connection : DB::Database
 
     def initialize(@table_name : String, @primary_field : String, @fields : Array(String), register = true)
       @connection = PG.connect(pg_url)
@@ -58,8 +58,7 @@ module PostgresAdapter
         end
       end
 
-      result = connection.exec(query, values)
-      result.rows[0][0]
+      return connection.scalar(query, values)
     end
 
     private def pgify_value(value)
@@ -71,22 +70,23 @@ module PostgresAdapter
         value.to_utc
       else
         value
-      end as PG::PGValue
+      end.as PG::PGValue
     end
 
     def get(id)
-      query = "SELECT #{fields.join(", ")} FROM #{table_name} WHERE #{primary_field} = $1"
-      result = connection.exec(query, [id])
-
-      return nil if result.rows.size == 0
-
-      extract_fields(result.rows[0])
+      query = "SELECT #{fields.join(", ")} FROM #{table_name} WHERE #{primary_field} = $1 LIMIT 1"
+      connection.query_one(query, id) do |rs|
+        extract_fields(rs)
+      end
+    rescue DB::Error
+      nil
     end
 
     def all
       query = "SELECT #{fields.join(", ")} FROM #{table_name}"
-      result = connection.exec(query)
-      extract_rows(result.rows)
+      result = connection.query_all(query) do |rs|
+        extract_fields(rs)
+      end
     end
 
     def where(query_hash : Hash)
@@ -116,8 +116,9 @@ module PostgresAdapter
       pg_query = "SELECT #{fields.join(", ")} FROM #{table_name} WHERE #{query}"
       params = pgify_params(params)
 
-      result = connection.exec(pg_query, params)
-      extract_rows(result.rows)
+      result = connection.query_all(pg_query, params) do |rs|
+        extract_fields(rs)
+      end
     end
 
     def pgify_params(params)
@@ -141,11 +142,11 @@ module PostgresAdapter
       connection.exec(query, [id])
     end
 
-    def extract_fields(row)
+    def extract_fields(rs)
       fields = {} of String => ActiveRecord::SupportedType
 
       self.fields.each_with_index do |name, index|
-        value = row[index]
+        value = rs.read
         if value.is_a?(ActiveRecord::SupportedType)
           fields[name] = value
         elsif !value.is_a?(Nil)
@@ -154,10 +155,6 @@ module PostgresAdapter
       end
 
       fields
-    end
-
-    def extract_rows(rows)
-      rows.map { |row| extract_fields(row) }
     end
 
     def self._reset_do_this_only_in_specs_78367c96affaacd7
