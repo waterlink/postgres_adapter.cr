@@ -45,7 +45,7 @@ module PostgresAdapter
 
     def create(fields)
       field_names = self.fields.select { |x| x != primary_field }
-      field_refs = (1...self.fields.size).map { |x| "$#{x}" }
+      field_refs = (1..self.fields.size).map { |x| "$#{x}" }
 
       query = "INSERT INTO #{table_name} (#{field_names.join(", ")}) VALUES (#{field_refs.join(", ")}) RETURNING #{primary_field}"
 
